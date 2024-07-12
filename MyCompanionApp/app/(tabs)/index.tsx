@@ -213,50 +213,52 @@ const Index = () => {
     return (
         <View style={styles.container}>
             <StatusBar hidden />
-            <View style={styles.background} />
-            <Text style={styles.header}>Bienvenue dans le Monde des AmiAmi</Text>
-            <View style={styles.characterContainer}>
-                <Animated.Image
-                    source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/tamagotchi.png')}
-                    style={[styles.character, { transform: [{ translateY: characterPosition }] }]}
-                    resizeMode="contain"
-                />
-            </View>
+            <View style={styles.wrapper}>
+                <View style={styles.background} />
+                <Text style={styles.header}>Bienvenue dans le Monde des AmiAmi</Text>
+                <View style={styles.characterContainer}>
+                    <Animated.Image
+                        source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/tamagotchi.png')}
+                        style={[styles.character, { transform: [{ translateY: characterPosition }] }]}
+                        resizeMode="contain"
+                    />
+                </View>
 
-            <View style={styles.statsContainer}>
-                <View style={styles.statBarContainer}>
-                    <Text style={styles.statsText}>Faim : {tamagotchi.faim} PV</Text>
-                    <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'orange' }]} />
+                <View style={styles.statsContainer}>
+                    <View style={styles.statBarContainer}>
+                        <Text style={styles.statsText}>Faim : {tamagotchi.faim} PV</Text>
+                        <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'orange' }]} />
+                    </View>
+                    <View style={styles.statBarContainer}>
+                        <Text style={styles.statsText}>Bonheur : {tamagotchi.bonheur} PV</Text>
+                        <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'blue' }]} />
+                    </View>
+                    <View style={styles.statBarContainer}>
+                        <Text style={styles.statsText}>Énergie : {tamagotchi.energie} PV</Text>
+                        <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'purple' }]} />
+                    </View>
+                    <Text style={styles.statsText}>Niveau de votre AmiAmi : {tamagotchi.level}</Text>
+                    <Text style={styles.statsText}>Temps écoulé : {timerCount} secondes</Text>
+                    <Text style={styles.information}>{information}</Text>
                 </View>
-                <View style={styles.statBarContainer}>
-                    <Text style={styles.statsText}>Bonheur : {tamagotchi.bonheur} PV</Text>
-                    <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'blue' }]} />
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={[styles.button, styles.restartButton]} onPress={restartTamagotchi} disabled={loading}>
+                        <Text style={styles.buttonText}>Recommencer</Text>
+                    </TouchableOpacity>
+                    <View style={styles.actionButtons}>
+                        <TouchableOpacity style={[styles.button, !tamagotchi.canFeed || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'orange' }]} onPress={() => interactWithTamagotchi('nourrir')} disabled={!tamagotchi.canFeed || loading || tamagotchi.isGameOver}>
+                            <Text style={styles.buttonText}>Nourrir</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.button, !tamagotchi.canPlay || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'blue' }]} onPress={() => interactWithTamagotchi('jouer')} disabled={!tamagotchi.canPlay || loading || tamagotchi.isGameOver}>
+                            <Text style={styles.buttonText}>Jouer</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.button, !tamagotchi.canRest || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'purple' }]} onPress={() => interactWithTamagotchi('reposer')} disabled={!tamagotchi.canRest || loading || tamagotchi.isGameOver}>
+                            <Text style={styles.buttonText}>Reposer</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={styles.statBarContainer}>
-                    <Text style={styles.statsText}>Énergie : {tamagotchi.energie} PV</Text>
-                    <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'purple' }]} />
-                </View>
-                <Text style={styles.statsText}>Niveau de votre AmiAmi : {tamagotchi.level}</Text>
-                <Text style={styles.statsText}>Temps écoulé : {timerCount} secondes</Text>
-                <Text style={styles.information}>{information}</Text>
+                {loading && <ActivityIndicator size="large" color="#0000ff" />}
             </View>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={[styles.button, styles.restartButton]} onPress={restartTamagotchi} disabled={loading}>
-                    <Text style={styles.buttonText}>Recommencer</Text>
-                </TouchableOpacity>
-                <View style={styles.actionButtons}>
-                    <TouchableOpacity style={[styles.button, !tamagotchi.canFeed || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'orange' }]} onPress={() => interactWithTamagotchi('nourrir')} disabled={!tamagotchi.canFeed || loading || tamagotchi.isGameOver}>
-                        <Text style={styles.buttonText}>Nourrir</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, !tamagotchi.canPlay || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'blue' }]} onPress={() => interactWithTamagotchi('jouer')} disabled={!tamagotchi.canPlay || loading || tamagotchi.isGameOver}>
-                        <Text style={styles.buttonText}>Jouer</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, !tamagotchi.canRest || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'purple' }]} onPress={() => interactWithTamagotchi('reposer')} disabled={!tamagotchi.canRest || loading || tamagotchi.isGameOver}>
-                        <Text style={styles.buttonText}>Reposer</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            {loading && <ActivityIndicator size="large" color="#0000ff" />}
         </View>
     );
 };
@@ -266,8 +268,19 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#5b5b5b', // Couleur de fond inspirée par Gameboy
+        backgroundColor: '#ffffff', // Couleur de fond de la page
+    },
+    wrapper: {
+        width: '80%', // Largeur fixe à 80% de la largeur de l'écran
+        maxWidth: 600, // Largeur maximale en pixels (optionnel)
+        padding: 20, // Espacement intérieur
+        borderRadius: 10, // Bordures arrondies
+        backgroundColor: '#f0f0f0', // Couleur de fond de la div
+        shadowColor: '#000', // Couleur de l'ombre
+        shadowOffset: { width: 0, height: 2 }, // Offset de l'ombre
+        shadowOpacity: 0.8, // Opacité de l'ombre
+        shadowRadius: 2, // Rayon de l'ombre
+        elevation: 5, // Effet d'élévation pour Android
     },
     background: {
         position: 'absolute',
@@ -295,10 +308,18 @@ const styles = StyleSheet.create({
         width: 150,
         height: 150,
         resizeMode: 'contain', // Ajustement de l'image pour éviter le flou
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 3,
+        elevation: 5, // Effet d'élévation pour Android
     },
     statsContainer: {
         marginBottom: 20,
         alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Fond semi-transparent pour les statistiques
+        borderRadius: 10,
+        padding: 10,
     },
     statsText: {
         fontSize: 18,
