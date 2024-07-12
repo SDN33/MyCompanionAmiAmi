@@ -237,10 +237,13 @@ const Index = () => {
                         <Text style={styles.statsText}>Énergie : {tamagotchi.energie} PV</Text>
                         <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'purple' }]} />
                     </View>
-                    <Text style={styles.statsText}>Niveau de votre AmiAmi : {tamagotchi.level}</Text>
-                    <Text style={styles.statsText}>Temps écoulé : {timerCount} secondes</Text>
-                    <Text style={styles.information}>{information}</Text>
                 </View>
+                <View style={styles.levelContainer}>
+                    <Image source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/star.png')} style={styles.levelImage} />
+                    <Text style={styles.levelText}>Lv.{tamagotchi.level}</Text>
+                </View>
+                <Text style={styles.statsText}>Temps écoulé : {timerCount} secondes</Text>
+                <Text style={styles.information}>{information}</Text>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.button, styles.restartButton]} onPress={restartTamagotchi} disabled={loading}>
                         <Text style={styles.buttonText}>Recommencer</Text>
@@ -268,23 +271,23 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ffffff', // Couleur de fond de la page
+        backgroundColor: '#ffffff',
     },
     wrapper: {
-        width: '80%', // Largeur fixe à 80% de la largeur de l'écran
-        maxWidth: 600, // Largeur maximale en pixels (optionnel)
-        padding: 20, // Espacement intérieur
-        borderRadius: 10, // Bordures arrondies
-        backgroundColor: '#f0f0f0', // Couleur de fond de la div
-        shadowColor: '#000', // Couleur de l'ombre
-        shadowOffset: { width: 0, height: 2 }, // Offset de l'ombre
-        shadowOpacity: 0.8, // Opacité de l'ombre
-        shadowRadius: 2, // Rayon de l'ombre
-        elevation: 5, // Effet d'élévation pour Android
+        width: '80%',
+        maxWidth: 600,
+        padding: 20,
+        borderRadius: 10,
+        backgroundColor: '#f0f0f0',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
     },
     background: {
         position: 'absolute',
-        backgroundColor: '#8bc34a', // Couleur d'arrière-plan inspirée par Pokemon
+        backgroundColor: '#8bc34a',
         top: 0,
         left: 0,
         right: 0,
@@ -295,7 +298,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
-        color: '#ffffff', // Texte blanc
+        color: '#ffffff',
         textShadowColor: '#000000',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,
@@ -307,17 +310,17 @@ const styles = StyleSheet.create({
     character: {
         width: 150,
         height: 150,
-        resizeMode: 'contain', // Ajustement de l'image pour éviter le flou
+        resizeMode: 'contain',
         shadowColor: '#000',
         shadowOffset: { width: 2, height: 2 },
         shadowOpacity: 0.8,
         shadowRadius: 3,
-        elevation: 5, // Effet d'élévation pour Android
+        elevation: 5,
     },
     statsContainer: {
         marginBottom: 20,
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Fond semi-transparent pour les statistiques
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
         borderRadius: 10,
         padding: 10,
     },
@@ -332,9 +335,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10,
         width: '100%',
-        backgroundColor: '#424242', // Fond des barres de statistiques
+        backgroundColor: '#424242',
         borderRadius: 5,
-        overflow: 'hidden', // Pour s'assurer que les barres ne dépassent pas du conteneur
+        overflow: 'hidden',
+        paddingLeft: 10,
     },
     statBar: {
         height: 10,
@@ -347,7 +351,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     restartButton: {
-        backgroundColor: '#f44336', // Bouton de redémarrage rouge
+        backgroundColor: '#f44336',
         marginBottom: 10,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -364,10 +368,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 5,
         marginHorizontal: 5,
-        backgroundColor: '#757575', // Couleur de bouton grise
+        backgroundColor: '#757575',
+        borderEndEndRadius: 10,
+        boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
     },
     disabledButton: {
-        backgroundColor: '#bdbdbd', // Couleur de bouton grise plus claire pour état désactivé
+        backgroundColor: '#bdbdbd',
     },
     buttonText: {
         color: '#ffffff',
@@ -376,12 +382,33 @@ const styles = StyleSheet.create({
     },
     information: {
         fontSize: 18,
-        color: '#ffffff',
+        color: 'black',
         textAlign: 'center',
         marginTop: 10,
+        marginBottom: 20,
         textShadowColor: '#000000',
-        textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,
+    },
+    levelContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    levelImage: {
+        width: 50,
+        height: 50,
+        marginRight: 0,
+    },
+    levelText: {
+        position: 'absolute',
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'black',
+        textAlign: 'center',
+        width: 50,
+        height: 50,
+        lineHeight: 50, // To center the text vertically
     },
 });
 
