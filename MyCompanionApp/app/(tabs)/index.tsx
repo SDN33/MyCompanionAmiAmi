@@ -48,13 +48,19 @@ const Index = () => {
 
     useEffect(() => {
         // Effet secondaire pour vérifier le niveau à chaque tick du minuteur
-    }, [timerCount]);
+        if (tamagotchi.level >= 5) {
+            // Exemple de traitement lorsque le niveau atteint 5 ou plus
+            console.log('Niveau élevé atteint !');
+        }
+    }, [tamagotchi.level]);
 
     const connectWebSocket = () => {
         websocketRef.current = new WebSocket('ws://localhost:5000');
 
         websocketRef.current.onopen = () => {
             console.log('WebSocket Client Connected');
+            let actionText = "Connexion établie avec le serveur.";
+            setInformation(actionText);
         };
 
         websocketRef.current.onmessage = (e) => {
@@ -119,7 +125,7 @@ const Index = () => {
             websocketRef.current.send(JSON.stringify({ type: 'restart' }));
             setTamagotchi(initialTamagotchiState);
             setTimerCount(0);
-            setInformation('Bienvenue dans le Monde des AmiAmi');
+            setInformation('Aide ton AmiAmi à survivre.');
             startTimer();
             await AsyncStorage.removeItem('tamagotchiState'); // Supprimer l'état enregistré
         }
@@ -144,6 +150,8 @@ const Index = () => {
             await AsyncStorage.setItem('tamagotchiState', JSON.stringify(tamagotchi));
         } catch (error) {
             console.error('Error saving game state:', error);
+            let actionText = "Erreur lors de la sauvegarde de l'état du jeu.";
+            setInformation(actionText);
         }
     };
 
@@ -155,6 +163,8 @@ const Index = () => {
             }
         } catch (error) {
             console.error('Error loading game state:', error);
+            let actionText = "Erreur lors du chargement de l'état du jeu.";
+            setInformation(actionText);
         }
     };
 
@@ -168,8 +178,6 @@ const Index = () => {
         inputRange: [0, 1],
         outputRange: [0, 20],
     });
-
-
 
     return (
         <View style={styles.container}>
@@ -187,17 +195,17 @@ const Index = () => {
             <View style={styles.statsContainer}>
                 <View style={styles.statBarContainer}>
                     <Text style={styles.statsText}>Faim : {tamagotchi.faim} PV</Text>
-                    <View style={[styles.statBar, { width: faimWidth }]} />
+                    <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'gray' }]} />
                 </View>
                 <View style={styles.statBarContainer}>
                     <Text style={styles.statsText}>Bonheur : {tamagotchi.bonheur} PV</Text>
-                    <View style={[styles.statBar, { width: bonheurWidth }]} />
+                    <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'gray' }]} />
                 </View>
                 <View style={styles.statBarContainer}>
                     <Text style={styles.statsText}>Énergie : {tamagotchi.energie} PV</Text>
-                    <View style={[styles.statBar, { width: energieWidth }]} />
+                    <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'gray' }]} />
                 </View>
-                <Text style={styles.statsText}>Niveau : {tamagotchi.level}</Text>
+                <Text style={styles.statsText}>Niveau de votre AmiAmi : {tamagotchi.level}</Text>
                 <Text style={styles.statsText}>Temps écoulé : {timerCount} secondes</Text>
                 <Text style={styles.information}>{information}</Text>
             </View>
@@ -206,13 +214,13 @@ const Index = () => {
                     <Text style={styles.buttonText}>Recommencer</Text>
                 </TouchableOpacity>
                 <View style={styles.actionButtons}>
-                    <TouchableOpacity style={[styles.button, !tamagotchi.canFeed || loading || tamagotchi.isGameOver ? styles.disabledButton : null]} onPress={() => interactWithTamagotchi('nourrir')} disabled={!tamagotchi.canFeed || loading || tamagotchi.isGameOver}>
+                    <TouchableOpacity style={[styles.button, !tamagotchi.canFeed || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'orange' }]} onPress={() => interactWithTamagotchi('nourrir')} disabled={!tamagotchi.canFeed || loading || tamagotchi.isGameOver}>
                         <Text style={styles.buttonText}>Nourrir</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, !tamagotchi.canPlay || loading || tamagotchi.isGameOver ? styles.disabledButton : null]} onPress={() => interactWithTamagotchi('jouer')} disabled={!tamagotchi.canPlay || loading || tamagotchi.isGameOver}>
+                    <TouchableOpacity style={[styles.button, !tamagotchi.canPlay || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'blue' }]} onPress={() => interactWithTamagotchi('jouer')} disabled={!tamagotchi.canPlay || loading || tamagotchi.isGameOver}>
                         <Text style={styles.buttonText}>Jouer</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, !tamagotchi.canRest || loading || tamagotchi.isGameOver ? styles.disabledButton : null]} onPress={() => interactWithTamagotchi('reposer')} disabled={!tamagotchi.canRest || loading || tamagotchi.isGameOver}>
+                    <TouchableOpacity style={[styles.button, !tamagotchi.canRest || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'purple' }]} onPress={() => interactWithTamagotchi('reposer')} disabled={!tamagotchi.canRest || loading || tamagotchi.isGameOver}>
                         <Text style={styles.buttonText}>Reposer</Text>
                     </TouchableOpacity>
                 </View>
@@ -231,7 +239,7 @@ const styles = StyleSheet.create({
     },
     background: {
         position: 'absolute',
-        backgroundColor: '#52DA96', // Couleur vert prairie
+        backgroundColor: 'lightgreen',
         top: 0,
         left: 0,
         right: 0,
@@ -242,7 +250,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
-        color: '#ffffff', // Couleur de texte blanc
+        color: '#ffffff',
     },
     characterContainer: {
         alignItems: 'center',
@@ -260,7 +268,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         marginBottom: 10,
-        color: '#ffffff', // Couleur de texte blanc
+        color: '#ffffff',
     },
     statBarContainer: {
         flexDirection: 'row',
@@ -269,7 +277,6 @@ const styles = StyleSheet.create({
     },
     statBar: {
         height: 10,
-        backgroundColor: 'blue',
         borderRadius: 5,
         flex: 1,
         marginLeft: 10,
@@ -291,9 +298,9 @@ const styles = StyleSheet.create({
     },
     button: {
         padding: 10,
-        backgroundColor: 'blue',
         borderRadius: 5,
         margin: 5,
+        backgroundColor: 'gray',
     },
     disabledButton: {
         backgroundColor: 'gray',

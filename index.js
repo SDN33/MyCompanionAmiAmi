@@ -125,7 +125,7 @@ function checkAndUpdateLevel() {
             if (isStillAboveZero) {
                 tamagotchiState.level++;
                 broadcastState(); // Notify clients of level up
-                console.log(`Level Up! New Level: ${tamagotchiState.level}`);
+                console.log(`Level Up! Nouveau niveau: ${tamagotchiState.level}`);
             }
             tamagotchiState.levelUpTimer = null;
         }, 30000);
