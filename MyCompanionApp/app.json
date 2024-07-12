@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "MyCompanionApp",
+    "slug": "MyCompanionApp",
+    "version": "1.0.0",
+    "notification": {
+      "serviceWorkerPath": "service-worker.js",
+      "vapidPublicKey": "BFJLZqQ9r9_2YdGqtQskyo1eytE5WLlvRk6geJWJmlEzhRN_VJL9zunJuzhuPRy9yAZjvA3Lz7LFCevS8L6zRnU"
+    },
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.mycompany.mycompanionapp"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "MyCompanionApp"
+      }
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
