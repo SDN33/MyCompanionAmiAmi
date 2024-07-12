@@ -1,4 +1,4 @@
-MyCompanionAmiAmi
+<h1>MyCompanionAmiAmi</h1>
 Ce dépôt contient le code source d'une application Tamagotchi simplifiée, avec un backend Node.js/Express et un frontend React Native.
 
 Structure du projet
