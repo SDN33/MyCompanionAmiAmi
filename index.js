@@ -105,14 +105,17 @@ async function reposerTamagotchi() {
 
 // Function to decrease a random attribute every second
 function decreaseRandomAttribute() {
-    const attributes = ['faim', 'bonheur', 'energie'];
-    const randomAttribute = attributes[Math.floor(Math.random() * attributes.length)];
-    tamagotchiState[randomAttribute] = Math.max(0, tamagotchiState[randomAttribute] - 2);
+  const attributes = ['faim', 'bonheur', 'energie'];
+  const randomAttribute = attributes[Math.floor(Math.random() * attributes.length)];
+  tamagotchiState[randomAttribute] = Math.max(0, tamagotchiState[randomAttribute] - 2);
 
-    if (tamagotchiState.faim === 0 || tamagotchiState.bonheur === 0 || tamagotchiState.energie === 0) {
-        console.log('AmiAmi est mort !');
-    }
-    broadcastState(); // Broadcast updated state to all clients
+  if (tamagotchiState.faim === 0 || tamagotchiState.bonheur === 0 || tamagotchiState.energie === 0) {
+      tamagotchiState.isGameOver = true; // Set game over state
+      console.log('AmiAmi est mort !');
+      broadcastState(); // Broadcast updated state to all clients
+  } else {
+      broadcastState(); // Broadcast updated state to all clients for normal updates
+  }
 }
 
 // Function to check and update the level
@@ -152,26 +155,28 @@ app.get('/tamagotchi', (_, res) => {
     res.json(getTamagotchiStateForClient());
 });
 
+
 // Restart Tamagotchi state function
 function restartTamagotchi() {
-    tamagotchiState = {
-        faim: 50,
-        bonheur: 50,
-        energie: 50,
-        lastFed: null,
-        lastPlayed: null,
-        lastRested: null,
-        canFeed: true,
-        canPlay: true,
-        canRest: true,
-        timeToFeed: 15,
-        timeToPlay: 15,
-        timeToRest: 15,
-        age: 0,
-        level: 1,
-        levelUpTimer: null
-    };
-    broadcastState(); // Broadcast initial state to all clients
+  tamagotchiState = {
+      faim: 50,
+      bonheur: 50,
+      energie: 50,
+      lastFed: null,
+      lastPlayed: null,
+      lastRested: null,
+      canFeed: true,
+      canPlay: true,
+      canRest: true,
+      timeToFeed: 15,
+      timeToPlay: 15,
+      timeToRest: 15,
+      age: 0,
+      level: 1,
+      levelUpTimer: null,
+      isGameOver: false // Reset game over state
+  };
+  broadcastState(); // Broadcast initial state to all clients
 }
 
 // Start the server

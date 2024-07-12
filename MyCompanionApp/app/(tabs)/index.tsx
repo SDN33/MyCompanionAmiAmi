@@ -40,19 +40,22 @@ const Index = () => {
     }, []);
 
     useEffect(() => {
+        // Effet secondaire pour vérifier la fin du jeu
         if (tamagotchi.isGameOver) {
-            setInformation('AmiAmi est mort. Le jeu va redémarrer.');
+            setInformation('AmiAmi est mort. Retentez votre chance.');
+            Speech.speak('AmiAmi est mort. Retentez votre chance.', {
+                voiceLocale: 'fr-FR'
+            });
             stopTimer();
         }
     }, [tamagotchi.isGameOver]);
 
     useEffect(() => {
-        // Effet secondaire pour vérifier le niveau à chaque tick du minuteur
-        if (tamagotchi.level >= 5) {
-            // Exemple de traitement lorsque le niveau atteint 5 ou plus
-            console.log('Niveau élevé atteint !');
+        // Effet secondaire pour vérifier le niveau toutes les 30 secondes
+        if (timerCount > 0 && timerCount % 30 === 0 && !tamagotchi.isGameOver) {
+            levelUp();
         }
-    }, [tamagotchi.level]);
+    }, [timerCount]);
 
     const connectWebSocket = () => {
         websocketRef.current = new WebSocket('ws://localhost:5000');
@@ -113,11 +116,36 @@ const Index = () => {
                     break;
             }
 
-            Speech.speak(actionText); // Annonce vocale correspondant à l'action
+            // Utilisation de la voix en français
+            Speech.speak(actionText, {
+                voiceLocale: 'fr-FR'
+            });
             setInformation(actionText);
             websocketRef.current.send(JSON.stringify({ type: action }));
-            setTimeout(() => setLoading(false), 1000); // Simule le délai d'interaction
+            setTimeout(() => {
+                setLoading(false);
+                // Vérifier si une barre est tombée à zéro après l'action
+                if (tamagotchi.faim <= 0 || tamagotchi.bonheur <= 0 || tamagotchi.energie <= 0) {
+                    setTamagotchi(prevState => ({
+                        ...prevState,
+                        isGameOver: true,
+                    }));
+                }
+            }, 1000); // Simule le délai d'interaction
         }
+    };
+
+    const levelUp = () => {
+        setTamagotchi(prevState => ({
+            ...prevState,
+            level: prevState.level + 1,
+        }));
+        setInformation('Votre AmiAmi a passé au niveau suivant !');
+        Speech.speak('Votre AmiAmi a passé au niveau suivant !', {
+            voiceLocale: 'fr-FR'
+        });
+        // Réinitialiser le compteur de temps après chaque niveau atteint
+        setTimerCount(0);
     };
 
     const restartTamagotchi = async () => {
@@ -125,7 +153,10 @@ const Index = () => {
             websocketRef.current.send(JSON.stringify({ type: 'restart' }));
             setTamagotchi(initialTamagotchiState);
             setTimerCount(0);
-            setInformation('Aide ton AmiAmi à survivre.');
+            setInformation('Aide ton AmiAmi a survivre.');
+            Speech.speak('Aide ton AmiAmi a survivre.', {
+                voiceLocale: 'fr-FR'
+            });
             startTimer();
             await AsyncStorage.removeItem('tamagotchiState'); // Supprimer l'état enregistré
         }
@@ -195,15 +226,15 @@ const Index = () => {
             <View style={styles.statsContainer}>
                 <View style={styles.statBarContainer}>
                     <Text style={styles.statsText}>Faim : {tamagotchi.faim} PV</Text>
-                    <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'gray' }]} />
+                    <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'orange' }]} />
                 </View>
                 <View style={styles.statBarContainer}>
                     <Text style={styles.statsText}>Bonheur : {tamagotchi.bonheur} PV</Text>
-                    <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'gray' }]} />
+                    <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'blue' }]} />
                 </View>
                 <View style={styles.statBarContainer}>
                     <Text style={styles.statsText}>Énergie : {tamagotchi.energie} PV</Text>
-                    <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'gray' }]} />
+                    <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'purple' }]} />
                 </View>
                 <Text style={styles.statsText}>Niveau de votre AmiAmi : {tamagotchi.level}</Text>
                 <Text style={styles.statsText}>Temps écoulé : {timerCount} secondes</Text>
@@ -236,21 +267,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
+        backgroundColor: '#5b5b5b', // Couleur de fond inspirée par Gameboy
     },
     background: {
         position: 'absolute',
-        backgroundColor: 'lightgreen',
+        backgroundColor: '#8bc34a', // Couleur d'arrière-plan inspirée par Pokemon
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
     },
     header: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
-        color: '#ffffff',
+        color: '#ffffff', // Texte blanc
+        textShadowColor: '#000000',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2,
     },
     characterContainer: {
         alignItems: 'center',
@@ -259,6 +294,7 @@ const styles = StyleSheet.create({
     character: {
         width: 150,
         height: 150,
+        resizeMode: 'contain', // Ajustement de l'image pour éviter le flou
     },
     statsContainer: {
         marginBottom: 20,
@@ -274,12 +310,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 10,
+        width: '100%',
+        backgroundColor: '#424242', // Fond des barres de statistiques
+        borderRadius: 5,
+        overflow: 'hidden', // Pour s'assurer que les barres ne dépassent pas du conteneur
     },
     statBar: {
         height: 10,
         borderRadius: 5,
-        flex: 1,
-        marginLeft: 10,
     },
     buttonContainer: {
         flexDirection: 'column',
@@ -288,33 +326,41 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     restartButton: {
-        backgroundColor: 'red',
+        backgroundColor: '#f44336', // Bouton de redémarrage rouge
         marginBottom: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
     },
     actionButtons: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
+        marginTop: 20,
     },
     button: {
-        padding: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         borderRadius: 5,
-        margin: 5,
-        backgroundColor: 'gray',
+        marginHorizontal: 5,
+        backgroundColor: '#757575', // Couleur de bouton grise
     },
     disabledButton: {
-        backgroundColor: 'gray',
+        backgroundColor: '#bdbdbd', // Couleur de bouton grise plus claire pour état désactivé
     },
     buttonText: {
-        color: 'white',
+        color: '#ffffff',
         fontSize: 16,
         textAlign: 'center',
     },
     information: {
-        fontSize: 20,
-        color: 'red',
+        fontSize: 18,
+        color: '#ffffff',
         textAlign: 'center',
         marginTop: 10,
+        textShadowColor: '#000000',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2,
     },
 });
 
