@@ -7,6 +7,7 @@ const Index = () => {
     const cloudAnimation = useRef(new Animated.Value(0)).current;
     const characterAnimation = useRef(new Animated.Value(0)).current;
     const zzzAnimation = useRef(new Animated.Value(0)).current;
+    const 
     const websocketRef = useRef<WebSocket | null>(null);
     const timerRef = useRef(null);
 
@@ -278,8 +279,11 @@ const Index = () => {
                     )}
                 </View>
 
-                <View style={styles.statsContainer}>
+                <TouchableOpacity style={[styles.button, styles.restartButton]} onPress={restartTamagotchi} disabled={loading}>
+                        <Text style={styles.buttonText}>Recommencer</Text>
+                    </TouchableOpacity>
 
+                <View style={styles.statsContainer}>
                     <View style={styles.levelContainer}>
                       <Image source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/star.png')} style={styles.levelImage} />
                       <Text style={styles.levelText}>{tamagotchi.level}</Text>
@@ -287,22 +291,22 @@ const Index = () => {
                     <Text style={styles.statsText}>Temps écoulé : {timerCount} sec</Text>
 
                     <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Faim 🤤 : {tamagotchi.faim} PV</Text>
+                        <Text style={styles.statsText}>Faim 🤤 :  </Text>
                         <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'orange' }]} />
+                        <Text style={styles.statsText}>  {tamagotchi.faim}</Text>
                     </View>
                     <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Bonheur 🥰 : {tamagotchi.bonheur} PV</Text>
+                        <Text style={styles.statsText}>Bonheur 🥰 :  </Text>
                         <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'blue' }]} />
+                        <Text style={styles.statsText}>  {tamagotchi.bonheur}</Text>
                     </View>
                     <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Énergie 💪 : {tamagotchi.energie} PV</Text>
+                        <Text style={styles.statsText}>Énergie 💪 :  </Text>
                         <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'purple' }]} />
+                        <Text style={styles.statsText}>  {tamagotchi.energie}</Text>
                     </View>
                 </View>
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={[styles.button, styles.restartButton]} onPress={restartTamagotchi} disabled={loading}>
-                        <Text style={styles.buttonText}>Recommencer</Text>
-                    </TouchableOpacity>
                     <View style={styles.actionButtons}>
                         <TouchableOpacity style={[styles.button, !tamagotchi.canFeed || loading || tamagotchi.isGameOver ? styles.disabledButton : { backgroundColor: 'orange' }]} onPress={() => interactWithTamagotchi('nourrir')} disabled={!tamagotchi.canFeed || loading || tamagotchi.isGameOver}>
                             <Text style={styles.buttonText}>Nourrir</Text>
@@ -357,6 +361,8 @@ const styles = StyleSheet.create({
         textShadowColor: '#000000',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,
+        backgroundColor: 'white',
+        opacity: 0.9,
     },
     characterContainer: {
         alignItems: 'center',
@@ -444,14 +450,13 @@ const styles = StyleSheet.create({
     },
     information: {
         fontSize: 18,
-        color: 'white',
+        color: 'black',
         textAlign: 'center',
         marginTop: 10,
         marginBottom: 20,
-        textShadowColor: '#000000',
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 2,
-        backgroundColor: 'black',
+        backgroundColor: 'white',
+
+
     },
     levelContainer: {
         flexDirection: 'row',
