@@ -1,7 +1,7 @@
 <h1>MyCompanionAmiAmi</h1>
 Ce dépôt contient le code source d'une application Tamagotchi simplifiée, avec un backend Node.js/Express et un frontend React Native.
 
-Structure du projet
+<h2>Structure du projet</h2>
 Le projet est structuré comme suit :
 
 MyCompanionAppBackend/ : Contient le backend Node.js/Express.
@@ -13,7 +13,7 @@ Node.js & npm (ou yarn)
 Expo CLI (pour le développement React Native)
 Un émulateur iOS/Android ou un appareil mobile avec Expo Go installé pour tester l'application.
 
-Installation
+<h2>Installation</h2>
 
 Cloner le dépôt :
 git clone git@github.com:SDN33/MyCompanionAmiAmi.git
@@ -34,7 +34,7 @@ cd ../MyCompanionApp
 npm install
 
 
-Configuration
+<h2>Configuration</h2>
 
 Backend :
 Assurez-vous que les variables d'environnement nécessaires sont configurées correctement (ex. port, clés d'API, etc.).
@@ -43,7 +43,7 @@ Frontend :
 Vérifiez le fichier de configuration pour l'URL du backend et ajustez si nécessaire.
 
 
-Démarrage
+<h2>Démarrage</h2>
 
 Backend :
 
@@ -63,7 +63,7 @@ Expo ouvrira une nouvelle fenêtre ou un onglet dans votre navigateur avec les o
 
 
 
-Fonctionnalités
+<h2>Fonctionnalités</h2>
 
 Nourrir, jouer, et reposer votre AmiAmi : Utilisez les boutons correspondants pour interagir avec votre Tamagotchi.
 
@@ -72,7 +72,7 @@ Suivi des statistiques : Visualisez les niveaux de faim, bonheur et énergie de 
 Réinitialisation : Redémarrez votre Tamagotchi en appuyant sur le bouton "Recommencer".
 
 
-Contributions
+<h2>Contributions</h2>
 Les contributions sous forme de suggestions, rapports de bogues et pull requests sont les bienvenues. Pour les changements majeurs, veuillez ouvrir d'abord un ticket pour discuter de ce que vous aimeriez changer.
 
 Licence
