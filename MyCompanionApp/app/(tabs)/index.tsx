@@ -278,14 +278,14 @@ const Index = () => {
                     )}
                 </View>
 
-                <View style={styles.levelContainer}>
-                    <Image source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/star.png')} style={styles.levelImage} />
-                    <Text style={styles.levelText}>Lv.{tamagotchi.level}</Text>
-                </View>
-                <Text style={styles.statsText}>Temps écoulé : {timerCount} sec</Text>
-
-
                 <View style={styles.statsContainer}>
+
+                    <View style={styles.levelContainer}>
+                      <Image source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/star.png')} style={styles.levelImage} />
+                      <Text style={styles.levelText}>Lv.{tamagotchi.level}</Text>
+                    </View>
+                    <Text style={styles.statsText}>Temps écoulé : {timerCount} sec</Text>
+
                     <View style={styles.statBarContainer}>
                         <Text style={styles.statsText}>Faim 🤤 : {tamagotchi.faim} PV</Text>
                         <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'orange' }]} />
