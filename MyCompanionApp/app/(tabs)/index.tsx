@@ -7,7 +7,7 @@ const Index = () => {
     const cloudAnimation = useRef(new Animated.Value(0)).current;
     const characterAnimation = useRef(new Animated.Value(0)).current;
     const zzzAnimation = useRef(new Animated.Value(0)).current;
-    const websocketRef = useRef(null);
+    const websocketRef = useRef<WebSocket | null>(null);
     const timerRef = useRef(null);
 
     const initialTamagotchiState = {
@@ -37,7 +37,7 @@ const Index = () => {
         animateClouds(); // Démarrer l'animation des nuages
         return () => {
             if (websocketRef.current) {
-                websocketRef.current.close();
+                (websocketRef.current as WebSocket).close();
             }
             saveGameState();
             stopTimer();
@@ -96,12 +96,12 @@ const Index = () => {
             Animated.sequence([
                 Animated.timing(zzzAnimation, {
                     toValue: -10,
-                    duration: 5000,
+                    duration: 10000,
                     useNativeDriver: true,
                 }),
                 Animated.timing(zzzAnimation, {
                     toValue: 0,
-                    duration: 5000,
+                    duration: 10000,
                     useNativeDriver: true,
                 }),
             ]),
@@ -133,7 +133,7 @@ const Index = () => {
         };
     };
 
-    const interactWithTamagotchi = (action) => {
+    const interactWithTamagotchi = (action: string) => {
         if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN && !tamagotchi.isGameOver) {
             setLoading(true);
             let actionText = '';
@@ -282,7 +282,7 @@ const Index = () => {
 
                     <View style={styles.levelContainer}>
                       <Image source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/star.png')} style={styles.levelImage} />
-                      <Text style={styles.levelText}>Lv.{tamagotchi.level}</Text>
+                      <Text style={styles.levelText}>{tamagotchi.level}</Text>
                     </View>
                     <Text style={styles.statsText}>Temps écoulé : {timerCount} sec</Text>
 
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
         maxWidth: 600,
         padding: 20,
         borderRadius: 10,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: 'WHITE',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.8,
@@ -460,16 +460,16 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     levelImage: {
-        width: 30,
-        height: 30,
+        width: 50,
+        height: 50,
         marginRight: 0,
     },
     levelText: {
         position: 'absolute',
         fontSize: 20,
         fontWeight: 'bold',
-        color: 'orange',
-        textShadowColor: '#000000',
+        color: 'darkorange',
+        textShadowColor: 'black',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,
         textAlign: 'center',
