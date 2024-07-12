@@ -4,6 +4,12 @@ import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Index = () => {
+    const cloudAnimation = useRef(new Animated.Value(0)).current;
+    const characterAnimation = useRef(new Animated.Value(0)).current;
+    const zzzAnimation = useRef(new Animated.Value(0)).current;
+    const websocketRef = useRef(null);
+    const timerRef = useRef(null);
+
     const initialTamagotchiState = {
         faim: 50,
         bonheur: 50,
@@ -16,46 +22,92 @@ const Index = () => {
         timeToRest: 15,
         level: 1,
         isGameOver: false,
-        isResting: false, // Nouvel état pour le repos
+        isResting: false,
     };
 
     const [tamagotchi, setTamagotchi] = useState(initialTamagotchiState);
     const [loading, setLoading] = useState(false);
     const [information, setInformation] = useState('Bienvenue dans le Monde des AmiAmi');
-    const [characterAnimation] = useState(new Animated.Value(0));
-    const [zzzAnimation] = useState(new Animated.Value(0));
     const [timerCount, setTimerCount] = useState(0);
-    const websocketRef = useRef<WebSocket | null>(null);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         connectWebSocket();
-        loadGameState(); // Charger l'état du jeu sauvegardé
+        loadGameState();
         startTimer();
+        animateClouds(); // Démarrer l'animation des nuages
         return () => {
             if (websocketRef.current) {
                 websocketRef.current.close();
             }
-            saveGameState(); // Sauvegarder l'état du jeu en partant
+            saveGameState();
             stopTimer();
         };
     }, []);
 
     useEffect(() => {
-        // Effet secondaire pour vérifier la fin du jeu
         if (tamagotchi.isGameOver) {
-            setInformation('AmiAmi est mort 😓. Retente votre chance.');
+            setInformation('AmiAmi est mort 😓. Retentez votre chance.');
             Speech.speak('AmiAmi est mort. Retentez votre chance.');
             stopTimer();
         }
     }, [tamagotchi.isGameOver]);
 
     useEffect(() => {
-        // Effet secondaire pour vérifier le niveau toutes les 30 secondes
         if (timerCount > 0 && timerCount % 30 === 0 && !tamagotchi.isGameOver) {
             levelUp();
         }
     }, [timerCount]);
+
+    const animateClouds = () => {
+      Animated.loop(
+          Animated.sequence([
+              Animated.timing(cloudAnimation, {
+                  toValue: 1,
+                  duration: 6000,
+                  useNativeDriver: true,
+              }),
+              Animated.timing(cloudAnimation, {
+                  toValue: 0,
+                  duration: 6000,
+                  useNativeDriver: true,
+              }),
+          ])
+      ).start();
+  };
+
+    const animateCharacter = () => {
+        Animated.sequence([
+            Animated.timing(characterAnimation, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+            Animated.timing(characterAnimation, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    };
+
+    const animateZzz = () => {
+        zzzAnimation.setValue(0);
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(zzzAnimation, {
+                    toValue: -10,
+                    duration: 5000,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(zzzAnimation, {
+                    toValue: 0,
+                    duration: 5000,
+                    useNativeDriver: true,
+                }),
+            ]),
+            { iterations: 3 }
+        ).start();
+    };
 
     const connectWebSocket = () => {
         websocketRef.current = new WebSocket('ws://localhost:5000');
@@ -81,41 +133,7 @@ const Index = () => {
         };
     };
 
-    const animateCharacter = () => {
-        Animated.sequence([
-            Animated.timing(characterAnimation, {
-                toValue: 1,
-                duration: 500,
-                useNativeDriver: true,
-            }),
-            Animated.timing(characterAnimation, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true,
-            }),
-        ]).start();
-    };
-
-    const animateZzz = () => {
-        zzzAnimation.setValue(0);
-        Animated.loop(
-            Animated.sequence([
-                Animated.timing(zzzAnimation, {
-                    toValue: -10,
-                    duration: 1000,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(zzzAnimation, {
-                    toValue: 0,
-                    duration: 1000,
-                    useNativeDriver: true,
-                }),
-            ]),
-            { iterations: 3 }
-        ).start();
-    };
-
-    const interactWithTamagotchi = (action: string) => {
+    const interactWithTamagotchi = (action) => {
         if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN && !tamagotchi.isGameOver) {
             setLoading(true);
             let actionText = '';
@@ -137,21 +155,21 @@ const Index = () => {
                     break;
             }
 
-            // Utilisation de la voix en français
             Speech.speak(actionText);
             setInformation(actionText);
             websocketRef.current.send(JSON.stringify({ type: action }));
+
             setTimeout(() => {
                 setLoading(false);
                 setTamagotchi(prevState => ({ ...prevState, isResting: false }));
-                // Vérifier si une barre est tombée à zéro après l'action
+
                 if (tamagotchi.faim <= 0 || tamagotchi.bonheur <= 0 || tamagotchi.energie <= 0) {
                     setTamagotchi(prevState => ({
                         ...prevState,
                         isGameOver: true,
                     }));
                 }
-            }, 1000); // Simule le délai d'interaction
+            }, 1000);
         }
     };
 
@@ -162,7 +180,6 @@ const Index = () => {
         }));
         setInformation('Votre AmiAmi a passé au niveau suivant !');
         Speech.speak('Votre AmiAmi a passé au niveau suivant !');
-        // Réinitialiser le compteur de temps après chaque niveau atteint
         setTimerCount(0);
     };
 
@@ -174,7 +191,7 @@ const Index = () => {
             setInformation('Aide ton AmiAmi a survivre.');
             Speech.speak('Aide ton AmiAmi a survivre.');
             startTimer();
-            await AsyncStorage.removeItem('tamagotchiState'); // Supprimer l'état enregistré
+            await AsyncStorage.removeItem('tamagotchiState');
         }
     };
 
@@ -215,12 +232,11 @@ const Index = () => {
         }
     };
 
-    // Calculer la largeur des barres de progression en fonction de l'état actuel du Tamagotchi
-    const faimWidth = (tamagotchi.faim / 100) * 200; // Largeur maximale arbitraire de 200 pour une faim à 100%
-    const bonheurWidth = (tamagotchi.bonheur / 100) * 200;
-    const energieWidth = (tamagotchi.energie / 100) * 200;
+    const cloudTransform = cloudAnimation.interpolate({
+        inputRange: [0, 1],
+        outputRange: [-20, 20],
+    });
 
-    // Animation pour le personnage
     const characterPosition = characterAnimation.interpolate({
         inputRange: [0, 1],
         outputRange: [0, 20],
@@ -231,13 +247,26 @@ const Index = () => {
         outputRange: [0, 10],
     });
 
+    const faimWidth = (tamagotchi.faim / 100) * 200;
+    const bonheurWidth = (tamagotchi.bonheur / 100) * 200;
+    const energieWidth = (tamagotchi.energie / 100) * 200;
+
     return (
         <View style={styles.container}>
             <StatusBar hidden />
             <View style={styles.wrapper}>
                 <View style={styles.background} />
-                <Image source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/cloud.png')} style={styles.cloudImage} />
+                <View style={styles.cloudContainer}>
+                    <Animated.Image
+                        source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/cloud.png')}
+                        style={[styles.cloudImage, { transform: [{ translateX: cloudTransform }] }]}
+                    />
+                </View>
+                <Image source={require('../../assets/images/landscape.png')} style={styles.landImage} />
                 <Text style={styles.header}>Bienvenue dans le Monde des AmiAmi</Text>
+
+                <Text style={styles.information}>{information}</Text>
+
                 <View style={styles.characterContainer}>
                     <Animated.Image
                         source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/tamagotchi.png')}
@@ -249,26 +278,27 @@ const Index = () => {
                     )}
                 </View>
 
-                <View style={styles.statsContainer}>
-                    <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Faim : {tamagotchi.faim} PV</Text>
-                        <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'orange' }]} />
-                    </View>
-                    <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Bonheur : {tamagotchi.bonheur} PV</Text>
-                        <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'blue' }]} />
-                    </View>
-                    <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Énergie : {tamagotchi.energie} PV</Text>
-                        <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'purple' }]} />
-                    </View>
-                </View>
                 <View style={styles.levelContainer}>
                     <Image source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/star.png')} style={styles.levelImage} />
                     <Text style={styles.levelText}>Lv.{tamagotchi.level}</Text>
                 </View>
-                <Text style={styles.information}>{information}</Text>
                 <Text style={styles.statsText}>Temps écoulé : {timerCount} sec</Text>
+
+
+                <View style={styles.statsContainer}>
+                    <View style={styles.statBarContainer}>
+                        <Text style={styles.statsText}>Faim 🤤 : {tamagotchi.faim} PV</Text>
+                        <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'orange' }]} />
+                    </View>
+                    <View style={styles.statBarContainer}>
+                        <Text style={styles.statsText}>Bonheur 🥰 : {tamagotchi.bonheur} PV</Text>
+                        <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'blue' }]} />
+                    </View>
+                    <View style={styles.statBarContainer}>
+                        <Text style={styles.statsText}>Énergie 💪 : {tamagotchi.energie} PV</Text>
+                        <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'purple' }]} />
+                    </View>
+                </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.button, styles.restartButton]} onPress={restartTamagotchi} disabled={loading}>
                         <Text style={styles.buttonText}>Recommencer</Text>
@@ -348,7 +378,7 @@ const styles = StyleSheet.create({
         left: 250,
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#0000ff',
+        color: 'white',
     },
     statsContainer: {
         marginBottom: 20,
@@ -361,7 +391,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         marginBottom: 10,
-        color: 'darkblue',
+        color: 'white',
     },
     statBarContainer: {
         flexDirection: 'row',
@@ -414,13 +444,14 @@ const styles = StyleSheet.create({
     },
     information: {
         fontSize: 18,
-        color: 'orange',
+        color: 'white',
         textAlign: 'center',
         marginTop: 10,
         marginBottom: 20,
         textShadowColor: '#000000',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,
+        backgroundColor: 'black',
     },
     levelContainer: {
         flexDirection: 'row',
@@ -450,9 +481,26 @@ const styles = StyleSheet.create({
     cloudImage: {
         position: 'absolute',
         top: 0,
-        right: 50,
-        width: 500,
+        right: 0,
+        width: 600,
         height: 150,
+    },
+
+    cloudContainer: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        width: 600,
+        height: 150,
+        overflow: 'hidden',
+    },
+
+    landImage: {
+        width: 600,
+        height: 350,
+        position: 'absolute',
+        top: -50,
+        left: 0,
     },
 });
 
