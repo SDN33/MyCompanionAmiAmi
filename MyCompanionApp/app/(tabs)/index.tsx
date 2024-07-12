@@ -16,15 +16,17 @@ const Index = () => {
         timeToRest: 15,
         level: 1,
         isGameOver: false,
+        isResting: false, // Nouvel état pour le repos
     };
 
     const [tamagotchi, setTamagotchi] = useState(initialTamagotchiState);
     const [loading, setLoading] = useState(false);
     const [information, setInformation] = useState('Bienvenue dans le Monde des AmiAmi');
     const [characterAnimation] = useState(new Animated.Value(0));
+    const [zzzAnimation] = useState(new Animated.Value(0));
     const [timerCount, setTimerCount] = useState(0);
-    const websocketRef = useRef(null);
-    const timerRef = useRef(null);
+    const websocketRef = useRef<WebSocket | null>(null);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         connectWebSocket();
@@ -42,10 +44,8 @@ const Index = () => {
     useEffect(() => {
         // Effet secondaire pour vérifier la fin du jeu
         if (tamagotchi.isGameOver) {
-            setInformation('AmiAmi est mort. Retentez votre chance.');
-            Speech.speak('AmiAmi est mort. Retentez votre chance.', {
-                voiceLocale: 'fr-FR'
-            });
+            setInformation('AmiAmi est mort 😓. Retente votre chance.');
+            Speech.speak('AmiAmi est mort. Retentez votre chance.');
             stopTimer();
         }
     }, [tamagotchi.isGameOver]);
@@ -96,7 +96,26 @@ const Index = () => {
         ]).start();
     };
 
-    const interactWithTamagotchi = (action) => {
+    const animateZzz = () => {
+        zzzAnimation.setValue(0);
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(zzzAnimation, {
+                    toValue: -10,
+                    duration: 1000,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(zzzAnimation, {
+                    toValue: 0,
+                    duration: 1000,
+                    useNativeDriver: true,
+                }),
+            ]),
+            { iterations: 3 }
+        ).start();
+    };
+
+    const interactWithTamagotchi = (action: string) => {
         if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN && !tamagotchi.isGameOver) {
             setLoading(true);
             let actionText = '';
@@ -110,6 +129,8 @@ const Index = () => {
                     break;
                 case 'reposer':
                     actionText = "Votre AmiAmi dort.";
+                    animateZzz();
+                    setTamagotchi(prevState => ({ ...prevState, isResting: true }));
                     break;
                 default:
                     actionText = `Action ${action} en cours.`;
@@ -117,13 +138,12 @@ const Index = () => {
             }
 
             // Utilisation de la voix en français
-            Speech.speak(actionText, {
-                voiceLocale: 'fr-FR'
-            });
+            Speech.speak(actionText);
             setInformation(actionText);
             websocketRef.current.send(JSON.stringify({ type: action }));
             setTimeout(() => {
                 setLoading(false);
+                setTamagotchi(prevState => ({ ...prevState, isResting: false }));
                 // Vérifier si une barre est tombée à zéro après l'action
                 if (tamagotchi.faim <= 0 || tamagotchi.bonheur <= 0 || tamagotchi.energie <= 0) {
                     setTamagotchi(prevState => ({
@@ -141,9 +161,7 @@ const Index = () => {
             level: prevState.level + 1,
         }));
         setInformation('Votre AmiAmi a passé au niveau suivant !');
-        Speech.speak('Votre AmiAmi a passé au niveau suivant !', {
-            voiceLocale: 'fr-FR'
-        });
+        Speech.speak('Votre AmiAmi a passé au niveau suivant !');
         // Réinitialiser le compteur de temps après chaque niveau atteint
         setTimerCount(0);
     };
@@ -154,9 +172,7 @@ const Index = () => {
             setTamagotchi(initialTamagotchiState);
             setTimerCount(0);
             setInformation('Aide ton AmiAmi a survivre.');
-            Speech.speak('Aide ton AmiAmi a survivre.', {
-                voiceLocale: 'fr-FR'
-            });
+            Speech.speak('Aide ton AmiAmi a survivre.');
             startTimer();
             await AsyncStorage.removeItem('tamagotchiState'); // Supprimer l'état enregistré
         }
@@ -210,11 +226,17 @@ const Index = () => {
         outputRange: [0, 20],
     });
 
+    const zzzPosition = zzzAnimation.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 10],
+    });
+
     return (
         <View style={styles.container}>
             <StatusBar hidden />
             <View style={styles.wrapper}>
                 <View style={styles.background} />
+                <Image source={require('/home/stephanedn/code/SDN33/MyCompanionAppBackend/MyCompanionApp/assets/images/cloud.png')} style={styles.cloudImage} />
                 <Text style={styles.header}>Bienvenue dans le Monde des AmiAmi</Text>
                 <View style={styles.characterContainer}>
                     <Animated.Image
@@ -222,6 +244,9 @@ const Index = () => {
                         style={[styles.character, { transform: [{ translateY: characterPosition }] }]}
                         resizeMode="contain"
                     />
+                    {tamagotchi.isResting && (
+                        <Animated.Text style={[styles.zzz, { transform: [{ translateY: zzzPosition }] }]}>Zzz</Animated.Text>
+                    )}
                 </View>
 
                 <View style={styles.statsContainer}>
@@ -287,7 +312,7 @@ const styles = StyleSheet.create({
     },
     background: {
         position: 'absolute',
-        backgroundColor: '#8bc34a',
+        backgroundColor: 'lightblue',
         top: 0,
         left: 0,
         right: 0,
@@ -298,7 +323,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
-        color: '#ffffff',
+        color: 'orange',
         textShadowColor: '#000000',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 2,
@@ -316,6 +341,14 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 3,
         elevation: 5,
+    },
+    zzz: {
+        position: 'absolute',
+        top: -10,
+        left: 250,
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#0000ff',
     },
     statsContainer: {
         marginBottom: 20,
@@ -370,7 +403,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         backgroundColor: '#757575',
         borderEndEndRadius: 10,
-        boxShadow: '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)',
     },
     disabledButton: {
         backgroundColor: '#bdbdbd',
@@ -393,11 +425,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 10,
     },
     levelImage: {
-        width: 50,
-        height: 50,
+        width: 30,
+        height: 30,
         marginRight: 0,
     },
     levelText: {
@@ -409,6 +441,14 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         lineHeight: 50, // To center the text vertically
+    },
+
+    cloudImage: {
+        position: 'absolute',
+        top: 0,
+        right: 50,
+        width: 500,
+        height: 150,
     },
 });
 
