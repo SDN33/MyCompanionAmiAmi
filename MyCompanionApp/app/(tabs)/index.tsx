@@ -290,17 +290,17 @@ const Index = () => {
                     <Text style={styles.statsText}>Temps écoulé : {timerCount} sec</Text>
 
                     <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Faim 🤤 :  </Text>
+                        <Text style={styles.statsText}>Faim       🤤:  </Text>
                         <View style={[styles.statBar, { width: faimWidth, backgroundColor: tamagotchi.canFeed ? 'orange' : 'orange' }]} />
                         <Text style={styles.statsText}>  {tamagotchi.faim}</Text>
                     </View>
                     <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Bonheur 🥰 :  </Text>
+                        <Text style={styles.statsText}>Bonheur 🥰:  </Text>
                         <View style={[styles.statBar, { width: bonheurWidth, backgroundColor: tamagotchi.canPlay ? 'blue' : 'blue' }]} />
                         <Text style={styles.statsText}>  {tamagotchi.bonheur}</Text>
                     </View>
                     <View style={styles.statBarContainer}>
-                        <Text style={styles.statsText}>Énergie 💪 :  </Text>
+                        <Text style={styles.statsText}>Énergie  💪:  </Text>
                         <View style={[styles.statBar, { width: energieWidth, backgroundColor: tamagotchi.canRest ? 'purple' : 'purple' }]} />
                         <Text style={styles.statsText}>  {tamagotchi.energie}</Text>
                     </View>
