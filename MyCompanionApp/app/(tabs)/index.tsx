@@ -7,7 +7,6 @@ const Index = () => {
     const cloudAnimation = useRef(new Animated.Value(0)).current;
     const characterAnimation = useRef(new Animated.Value(0)).current;
     const zzzAnimation = useRef(new Animated.Value(0)).current;
-    const 
     const websocketRef = useRef<WebSocket | null>(null);
     const timerRef = useRef(null);
 
@@ -455,8 +454,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         backgroundColor: 'white',
-
-
     },
     levelContainer: {
         flexDirection: 'row',
